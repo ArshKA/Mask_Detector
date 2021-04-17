@@ -7,7 +7,7 @@ import os
 from os import path
 import random
 import shutil
-import urllib
+import urllib.request
 
 
 import keras
@@ -15,20 +15,26 @@ from keras.models import load_model
 
 class MaskDetector:
   
-  def __init__(self, mask_model_path = 'mask.keras')
+  def __init__(self, mask_model_path = None):
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    if not mask_model_path:
+      mask_model_path = dir_path + '/mask.keras'
+
     self.model = load_model(mask_model_path)
 
-    if not path.exists('deploy.prototxt'):
-      urllib.urlretrieve('https://raw.githubusercontent.com/opencv/opencv/master/samples/dnn/face_detector/deploy.prototxt', 'deploy.prototxt')
-    if not path.exists('res10_300x300_ssd_iter_140000.caffemodel'):
-      urllib.urlretrieve('https://raw.githubusercontent.com/opencv/opencv_3rdparty/dnn_samples_face_detector_20170830/res10_300x300_ssd_iter_140000.caffemodel', 'res10_300x300_ssd_iter_140000.caffemodel')
+    prototxt_path = dir_path + '/deploy.prototxt'
+    model_path = dir_path + '/res10_300x300_ssd_iter_140000.caffemodel'
 
-    prototxt_path = 'deploy.prototxt'
-    model_path = 'res10_300x300_ssd_iter_140000.caffemodel'
+    if not path.exists(prototxt_path):
+      urllib.request.urlretrieve('https://raw.githubusercontent.com/opencv/opencv/master/samples/dnn/face_detector/deploy.prototxt', prototxt_path)
+    if not path.exists(model_path):
+      urllib.request.urlretrieve('https://raw.githubusercontent.com/opencv/opencv_3rdparty/dnn_samples_face_detector_20170830/res10_300x300_ssd_iter_140000.caffemodel', model_path)
+
+
     self.net = cv2.dnn.readNetFromCaffe(prototxt_path, model_path)
 
 
-  def get_face(self, image):
+  def get_face(self, image, face_confidence):
     (h, w) = image.shape[:2]
 
     blob = cv2.dnn.blobFromImage(cv2.resize(image, (300, 300)), 1.0, (300, 300), (104.0, 177.0, 123.0))
@@ -40,16 +46,16 @@ class MaskDetector:
       # extract the confidence (i.e., probability) associated with the prediction
       confidence = detections[0, 0, i, 2]
 
-      if confidence > 0.2:
+      if confidence > face_confidence:
         box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
         faces[i] = box
     return faces
 
-  def detect(self, img_name, save=True):
+  def detect(self, img_name, save=True, face_confidence=.2):
     # First one takes some time
     image = cv2.imread(img_name)
     write_img = np.array(image)
-    faces = get_face(image)
+    faces = self.get_face(image, face_confidence)
     faces = [x for x in faces if np.sum(x) != 0]
     for face in faces:
       face = face.astype(int)
