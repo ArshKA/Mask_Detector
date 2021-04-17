@@ -12,8 +12,10 @@ Unzip the detector model
 ## USING
 
 Create a detector object
-```from main import MaskDetector
-detector = MaskDetector(model_path=current_directory)```
+```
+from main import MaskDetector
+detector = MaskDetector(model_path=current_directory)
+```
 
 Pass image through detector
 
