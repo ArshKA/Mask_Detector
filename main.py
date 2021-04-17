@@ -15,8 +15,8 @@ from keras.models import load_model
 
 class MaskDetector:
   
-  def __init__(self)
-    self.model = load_model('mask.keras')
+  def __init__(self, mask_model_path = 'mask.keras')
+    self.model = load_model(mask_model_path)
 
     if not path.exists('deploy.prototxt'):
       urllib.urlretrieve('https://raw.githubusercontent.com/opencv/opencv/master/samples/dnn/face_detector/deploy.prototxt', 'deploy.prototxt')
