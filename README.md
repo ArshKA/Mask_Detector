@@ -17,5 +17,7 @@ detector = MaskDetector(model_path=current_directory)
 ```
 
 Pass image through detector
+
 ```marked_image = detector.detect(image_path, save=True, face_confidence=.2)```
+
 An output.png file will be crated in the file's directory
