@@ -68,5 +68,6 @@ class MaskDetector:
         cv2.putText(write_img, text, (face[0], face[1]), cv2.FONT_HERSHEY_SIMPLEX, .6, (0, 0, 255), 2)
         cv2.rectangle(write_img, (face[0], face[1]), (face[2], face[3]), (0, 0, 255), 2)
 
-    cv2.imwrite('output.png', write_img)
+    if save:
+      cv2.imwrite('output.png', write_img)
     return write_img
