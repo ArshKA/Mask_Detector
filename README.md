@@ -1,15 +1,15 @@
-### Mask_Detector
+## Mask_Detector
 
 Identifies faces and whether they are wearing masks in an image
 
-## SET UP
+### SET UP
 Clone the repository
 
 ```git clone https://github.com/ArshKA/Mask_Detector.git```
 
 Unzip the detector model
 
-## USING
+### USING
 
 Create a detector object
 ```
