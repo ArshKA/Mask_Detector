@@ -9,21 +9,24 @@ import random
 import shutil
 import urllib.request
 
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2' 
 
-import keras
-from keras.models import load_model
+from keras.applications.vgg16 import VGG16
+from keras.models import Sequential
+from keras.layers import Dense, Dropout, Flatten
+from keras.optimizers import Adam
 
 class MaskDetector:
   
   def __init__(self, mask_model_path = None):
-    dir_path = os.path.dirname(os.path.realpath(__file__))
+    self.dir_path = os.path.dirname(os.path.realpath(__file__))
     if not mask_model_path:
-      mask_model_path = dir_path + '/mask.keras'
+      mask_model_path = self.dir_path + '/model_weights.keras'
 
-    self.model = load_model(mask_model_path)
+    self.load_model(mask_model_path)
 
-    prototxt_path = dir_path + '/deploy.prototxt'
-    model_path = dir_path + '/res10_300x300_ssd_iter_140000.caffemodel'
+    prototxt_path = self.dir_path + '/deploy.prototxt'
+    model_path = self.dir_path + '/res10_300x300_ssd_iter_140000.caffemodel'
 
     if not path.exists(prototxt_path):
       urllib.request.urlretrieve('https://raw.githubusercontent.com/opencv/opencv/master/samples/dnn/face_detector/deploy.prototxt', prototxt_path)
@@ -33,6 +36,24 @@ class MaskDetector:
 
     self.net = cv2.dnn.readNetFromCaffe(prototxt_path, model_path)
 
+  def create_model(self):
+    self.model = Sequential()
+    vg = VGG16(weights = 'imagenet')
+
+    for layer in vg.layers[:-3]:
+      layer.trainable = False
+      self.model.add(layer)
+    self.model.add(Dense(512, activation='relu'))
+    self.model.add(Dense(512, activation='relu'))
+    self.model.add(Dense(256))
+    self.model.add(Dense(256))
+    self.model.add(Dense(256))
+    self.model.add(Dense(2, activation = 'softmax'))
+    self.model.compile(optimizer=Adam(), loss = 'categorical_crossentropy', metrics = ['accuracy'])
+
+  def load_model(self, mask_model_path):
+    self.create_model()
+    self.model.load_weights(mask_model_path)
 
   def get_face(self, image, face_confidence):
     (h, w) = image.shape[:2]
@@ -75,5 +96,5 @@ class MaskDetector:
         cv2.rectangle(write_img, (face[0], face[1]), (face[2], face[3]), (0, 0, 255), 2)
 
     if save:
-      cv2.imwrite('output.png', write_img)
+      cv2.imwrite(self.dir_path + '/output.png', write_img)
     return write_img
