@@ -27,4 +27,4 @@ An output.png file will be created in the file's directory
 
 Image                     |Predicted
 :-------------------------:|:-------------------------:
-![Image 1](media/mask1.jpg "Image 1") | ![Predicted 1](media/mask1Output.png "Predicted 1")
+![Image 1](media/masks1.jpg "Image 1") | ![Predicted 1](media/masks1Output.png "Predicted 1")
