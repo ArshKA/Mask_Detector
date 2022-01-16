@@ -22,3 +22,9 @@ Pass image through detector
 ```marked_image = detector.detect(image_path, save=True, face_confidence=.2)```
 
 An output.png file will be created in the file's directory
+
+### RESULTS
+
+Image                     |Predicted
+:-------------------------:|:-------------------------:
+![Image 1](media/mask1.jpg "Image 1") | ![Predicted 1](media/mask1Output.png "Predicted 1")
